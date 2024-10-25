@@ -1,6 +1,6 @@
 from app.model.ChatMessageModel import ChatMessage
 from app.model.MessageModel import MessageContent, TextContent
-from groq import Groq
+from groq import AsyncGroq
 from typing import List
 from app.model.PersonaModel import Persona
 from app.model.PersonaRequestModel import PersonaRequest
@@ -22,7 +22,7 @@ class GroqChat(metaclass=Singleton):
     
     async def getPersonas(self, req:PersonaRequest):
         # Create the Groq client
-        client = Groq(api_key=self.GROQ_API_KEY)
+        client = AsyncGroq(api_key=self.GROQ_API_KEY)
         propmt = f"""Create 10 personas for a marketing campaign with the following parameters: Age {req.age_min}-{req.age_max}, Gender {req.gender}, Location {req.location}, Other factors {req.other}.
                       Return a JSON of the 10 personas with the following fields :  name, age, gender, location, income_level, occupation, lifestyle_interests, ocean_trait, implicit_drivers, purchase_behaviors, and preferred_buying_platform."""
         chatMessage = ChatMessage()

@@ -1,12 +1,12 @@
 import json
 from typing import List
+import warnings
 from app.chat.getGroqChat import GroqChat
 from app.model.PersonaModel import Persona
 from app.model.PersonaRequestModel import PersonaRequest
-from fastapi import Depends, APIRouter, Body
-from fastapi import BackgroundTasks
+from fastapi import Depends, APIRouter, Body, HTTPException # type: ignore
+from fastapi import BackgroundTasks # type: ignore
 from app.configuration.getConfig import Config
-import groq
 
 
 # get the config file
@@ -30,7 +30,11 @@ async def personas(personaRequest: PersonaRequest = Body(None)):
     :param data:
     :return:
     """
-    response = await groqChat.getPersonas(personaRequest)
-    return response
+    try:
+        response = await groqChat.getPersonas(personaRequest)
+        return response
+    except Exception as e:
+        warnings.warn(str(e))
+        raise HTTPException(status_code=404, detail=str(e))
 
 

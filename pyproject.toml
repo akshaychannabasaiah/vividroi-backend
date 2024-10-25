@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "frontend"
+name = "backend"
 version = "0.1.0"
-description = "A fastapi template project "
-authors = ["Florian Salfenmoser <florian.salfenmoser.dev@outlook.de>"]
+description = "Backend service for VIVID.ROI"
+authors = ["Akshay Channabasaiah <aksc.champ@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

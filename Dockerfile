@@ -88,7 +88,7 @@ COPY ./poetry.lock poetry.lock
 COPY ./pyproject.toml pyproject.toml
 # Install the python packages
 WORKDIR app/
-ENV POETRY_ENV=frontend
+ENV POETRY_ENV=backend
 RUN poetry install --without dev
 
 # Copy application contents to the container
