@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from app.configuration.getConfig import Config
 # routers
-from app.routers import config, benchmark
+from app.routers import chatService, config, benchmark
 
 # get the config file
 configuration = Config()
@@ -20,6 +20,7 @@ app = FastAPI(
 # include the routers
 app.include_router(config.router)
 app.include_router(benchmark.router)
+app.include_router(chatService.router)
 
 
 # needed to start the application locally for development/debugging purpose. Will never be called on K8s.
