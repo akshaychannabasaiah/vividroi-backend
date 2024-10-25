@@ -1,10 +1,10 @@
-from app.model.ChatMessageModel import ChatMessage
+from app.model.ChatMessageModel import ChatMessage, ResponseFormat
 from app.model.MessageModel import MessageContent, TextContent
 from groq import AsyncGroq
 from typing import List
 from app.model.PersonaModel import Persona
 from app.model.PersonaRequestModel import PersonaRequest
-
+from pydantic import BaseModel, Field, Json
 from app.configuration.getConfig import Config
 from app.helper.pattern.singleton import Singleton
 
@@ -23,17 +23,19 @@ class GroqChat(metaclass=Singleton):
     async def getPersonas(self, req:PersonaRequest):
         # Create the Groq client
         client = AsyncGroq(api_key=self.GROQ_API_KEY)
-        propmt = f"""Create 10 personas for a marketing campaign with the following parameters: Age {req.age_min}-{req.age_max}, Gender {req.gender}, Location {req.location}, Other factors {req.other}.
+        prompt = f"""Create 10 personas for a marketing campaign with the following parameters: Age {req.age_min}-{req.age_max}, Gender {req.gender}, Location {req.location}, Other factors {req.other}.
                       Return a JSON of the 10 personas with the following fields :  name, age, gender, location, income_level, occupation, lifestyle_interests, ocean_trait, implicit_drivers, purchase_behaviors, and preferred_buying_platform."""
-        chatMessage = ChatMessage()
-        chatMessage.model = self.model
-        message = MessageContent()
-        message.role = "user"
-        message.content = TextContent()
-        message.content.type = "text"
-        message.content.text = propmt
-        chatMessage.messages = MessageContent()[message]
-        chatMessage.max_tokens = 2500
-        chatMessage.response_format= """{"type": "json_object"}"""
-        response = await client.chat.completions.create(chatMessage)
-        return response
+        textContent = TextContent(type="text", text=prompt)
+        message = MessageContent(role="user", content=[textContent])
+        messages = [message]
+        responseFormat = ResponseFormat(type="json_object")
+        chatMessage = ChatMessage(model=self.model,
+                                  max_tokens=2500,
+                                  messages=messages,
+                                  response_format= responseFormat)
+        
+        chat_completion = await client.chat.completions.create(model=self.model,
+                                  max_tokens=2500,
+                                  messages=messages,
+                                  response_format= responseFormat)
+        return chat_completion.choices[0].message.content

@@ -32,7 +32,12 @@ async def personas(personaRequest: PersonaRequest = Body(None)):
     """
     try:
         response = await groqChat.getPersonas(personaRequest)
-        return response
+        jsonVal = json.loads(response)
+        try:
+            personas = jsonVal["personas"]
+        except:
+            personas = jsonVal["Personas"]
+        return personas
     except Exception as e:
         warnings.warn(str(e))
         raise HTTPException(status_code=404, detail=str(e))

@@ -16,4 +16,4 @@ class ImageContent(Content):
         
 class MessageContent(BaseModel):
     role: str
-    content: Content
+    content: List[Content]

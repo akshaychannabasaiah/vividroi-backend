@@ -8,8 +8,8 @@ class Persona(BaseModel):
     location: str
     income_level: str
     occupation: str
-    lifestyle_interests: List[str]
+    lifestyle_interests: str
     ocean_trait: str
-    implicit_drivers: List[str]
-    purchase_behaviours: List[str]
-    prefered_buying_platform: str
+    implicit_drivers: str
+    purchase_behaviors: str
+    preferred_buying_platform: str
