@@ -4,7 +4,6 @@ from app.configuration.configparser.wrapper import ConfigparserWrapper as Config
 from app.helper.log.logger import Logger
 from app.helper.pattern.singleton import Singleton
 
-
 class Config(metaclass=Singleton):
     """
     Get the configuration.ini and the source connection.
@@ -42,6 +41,13 @@ class Config(metaclass=Singleton):
             self.debug = True
 
         try:
+            self.GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+            print("GROQ API KEY Loaded")
+        except Exception as e:
+            print("GROQ API KEY NOT Loaded")
+            warnings.warn(str(e) + "GROQ API KEY NOT Loaded")
+
+        try:
             self.in_folder: str = "." + self.configparser["FOLDER"]["IN"] if self.is_local \
                 else self.configparser["FOLDER"]["IN"]
             self.out_folder: str = "." + self.configparser["FOLDER"]["OUT"] if self.is_local \
@@ -55,6 +61,6 @@ class Config(metaclass=Singleton):
             self.logger.log(self.logger.LEVEL.ERROR, 500, "Could not parse the config: " + str(e),
                             "app.configuration.getConfig.Config")
 
-        self.configuration_dict = self.config.get_dict_anon(exclude=["pwd", "password", "secret", "url"])
+        self.configuration_dict = self.config.get_dict_anon(exclude=["pwd", "password", "secret", "url", "GROQ_API_KEY"])
         print("CONFIGURATION: (Some key/value pairs are anonymized or not present due to sensitive data)")
         print(self.configuration_dict)
