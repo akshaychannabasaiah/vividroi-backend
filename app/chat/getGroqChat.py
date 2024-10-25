@@ -24,15 +24,12 @@ class GroqChat(metaclass=Singleton):
         # Create the Groq client
         client = AsyncGroq(api_key=self.GROQ_API_KEY)
         prompt = f"""Create 10 personas for a marketing campaign with the following parameters: Age {req.age_min}-{req.age_max}, Gender {req.gender}, Location {req.location}, Other factors {req.other}.
-                      Return a JSON of the 10 personas with the following fields :  name, age, gender, location, income_level, occupation, lifestyle_interests, ocean_trait, implicit_drivers, purchase_behaviors, and preferred_buying_platform."""
+                     Return a JSON of the 10 personas with the following fields :  name, age, gender, location, income_level, occupation, lifestyle_interests, ocean_trait, implicit_drivers, purchase_behaviors, and preferred_buying_platform.                      
+                     Strictly adhere to this JSON format {{ "personas":["name":"", "age":, "gender":"", "location":"", "income_level":"", "occupation":"", "lifestyle_interests":", ", "ocean_trait":"", "implicit_drivers":", ", "purchase_behaviors":", "], "preferred_buying_platform":""]}}"""
         textContent = TextContent(type="text", text=prompt)
         message = MessageContent(role="user", content=[textContent])
         messages = [message]
         responseFormat = ResponseFormat(type="json_object")
-        chatMessage = ChatMessage(model=self.model,
-                                  max_tokens=2500,
-                                  messages=messages,
-                                  response_format= responseFormat)
         
         chat_completion = await client.chat.completions.create(model=self.model,
                                   max_tokens=2500,
