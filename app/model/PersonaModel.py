@@ -1,6 +1,8 @@
 from typing import List
 from pydantic import BaseModel
 
+from app.model.ChatMessageModel import ChatCompletionMessageParam
+
 class Persona(BaseModel):
     name: str
     age: int
@@ -13,3 +15,7 @@ class Persona(BaseModel):
     implicit_drivers: str
     purchase_behaviors: str
     preferred_buying_platform: str
+
+class PersonaResponse(BaseModel):
+    messages: List[ChatCompletionMessageParam]
+    personas: List[Persona]

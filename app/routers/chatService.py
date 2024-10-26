@@ -2,10 +2,12 @@ import json
 from typing import List
 import warnings
 from app.chat.getGroqChat import GroqChat
-from app.model.PersonaModel import Persona
+from app.model.CampaignAnalysisModel import CampaignAnalysis, CampaignAnalysisResponse
+from app.model.CampaignRequestModel import CampaignRequest
+from app.model.PersonaModel import Persona, PersonaResponse
 from app.model.PersonaRequestModel import PersonaRequest
-from fastapi import Depends, APIRouter, Body, HTTPException # type: ignore
-from fastapi import BackgroundTasks # type: ignore
+from fastapi import Depends, APIRouter, Body, HTTPException 
+from fastapi import BackgroundTasks 
 from app.configuration.getConfig import Config
 
 
@@ -23,7 +25,7 @@ router = APIRouter()
 # Logger
 logger = configuration.logger
 
-@router.post("/chat/personas", tags=["Persona,PersonaRequest"], response_model=List[Persona])
+@router.post("/chat/personas", tags=["Chat"], response_model=PersonaResponse)
 async def personas(personaRequest: PersonaRequest = Body(None)):
     """
     Returns personas to the given attributes
@@ -32,14 +34,22 @@ async def personas(personaRequest: PersonaRequest = Body(None)):
     """
     try:
         response = await groqChat.getPersonas(personaRequest)
-        jsonVal = json.loads(response)
-        try:
-            personas = jsonVal["personas"]
-        except:
-            personas = jsonVal["Personas"]
-        return personas
+        return response
     except Exception as e:
         warnings.warn(str(e))
         raise HTTPException(status_code=404, detail=str(e))
 
 
+@router.post("/chat/campaign", tags=["Chat"], response_model=CampaignAnalysisResponse)
+async def campaign(campaignRequest: CampaignRequest = Body(None)):
+    """
+    Returns personas to the given attributes
+    :param data:
+    :return:
+    """
+    try:
+        response = await groqChat.getCampaignAnalysis(campaignRequest)
+        return response
+    except Exception as e:
+        warnings.warn(str(e))
+        raise HTTPException(status_code=404, detail=str(e))
