@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.configuration.getConfig import Config
 # routers
 from app.routers import chatService, config, benchmark
+from fastapi.middleware.cors import CORSMiddleware
 
 # get the config file
 configuration = Config()
@@ -12,10 +13,26 @@ API_VERSION = configuration.API_VERSION
 
 # fastAPI Instance
 app = FastAPI(
-    title="Python FastAPI Template (API ID: "
+    title="Vivid ROI Backend (API ID: "
     + str(API_ID) + ")", docs_url="/", version=configuration.API_VERSION
 )
 
+
+origins = [
+    "https://vividroi.azurewebsites.net",
+    "https://vividroi-react.azurewebsites.net",
+    "https://localhost",
+    "https://localhost:41250",
+    "https://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # include the routers
 app.include_router(config.router)
