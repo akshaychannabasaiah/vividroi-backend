@@ -18,9 +18,6 @@ class ImageURL(BaseModel):
     url: str
     """Either a URL of the image or the base64 encoded image data."""
 
-    detail: Optional[Literal["auto", "low", "high"]]
-    """Specifies the detail level of the image."""
-
 class ChatCompletionContentPartImageParam(BaseModel):
     image_url: ImageURL
 

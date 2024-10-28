@@ -4,6 +4,7 @@ from app.model.CampaignRequestModel import CampaignRequest
 from app.model.ChatMessageModel import ChatCompletionAssistantMessageParam, ChatCompletionContentPartImageParam, ChatCompletionContentPartTextParam, ChatCompletionMessageParam, ChatCompletionUserMessageParam, ChatMessage, ImageURL, ResponseFormat
 from groq import AsyncGroq
 from typing import List
+from app.model.OutcomeResponseModel import OutcomeRequest, OutcomeResponse
 from app.model.PersonaModel import Persona, PersonaResponse
 from app.model.PersonaRequestModel import PersonaRequest
 from pydantic import BaseModel, Field, Json
@@ -59,11 +60,6 @@ Strictly provide the response in this JSON format only {{"analysis":[{{"name":"P
 Do not include any text other than the JSON.
 """
 
-        # textContent = TextContent(type="text", text=prompt)
-        # imageContent = ImageContent(type="image_url",image_url=ImageUrl(url=req.img))
-        # message = MessageContent(role="user", content=[textContent, imageContent])
-        # messages = req.messages.append(message)
-        # messages = req.messages
 
         textContent = ChatCompletionContentPartTextParam(type="text", text=prompt)
         imageContent = ChatCompletionContentPartImageParam(type="image_url", image_url=ImageURL(url=req.img))
@@ -80,6 +76,8 @@ Do not include any text other than the JSON.
                                   response_format= responseFormat)
         
         assistantMessage = ChatCompletionAssistantMessageParam(role="assistant", content = chat_completion.choices[0].message.content)
+                
+        messages.append(assistantMessage)
         
         
         jsonVal = json.loads(assistantMessage.content)
@@ -88,3 +86,44 @@ Do not include any text other than the JSON.
         except:
             analysis = jsonVal["Analysis"]
         return CampaignAnalysisResponse(messages=messages,analysis=analysis)
+        
+    async def getOutcomes(self, outcomeRequest:OutcomeRequest):
+        # Create the Groq client
+        client = AsyncGroq(api_key=self.GROQ_API_KEY)
+        prompt = f"""Generate a predictive outcomes analysis for the generated synthetic data. Include sections that focus on the following key metrics:
+Engagement Rate Prediction: Provide a description of audience engagement likelihood, with a percentage metric.
+Goal Attainment: Outline the effectiveness for achieving campaign goals, particularly for registrations or conversions, with a percentage metric.
+Platform Effectiveness: Analyze the platforms’ performance in driving results, with a percentage metric.
+Positive Sentiment: Predict the audience’s emotional reaction to the campaign, including familiarity and humor, with a percentage metric.
+Click-Through Rate (CTR): Show the likelihood of generating clicks, influenced by urgency and emotional triggers, with a percentage metric.
+
+Display each metric in a visually appealing format, ensuring percentage metrics are clearly placed next to each prediction for clarity and ease of understanding.
+
+Strictly provide the response in this JSON format only - 
+{{"outcomes":[{{"name":"Engagement Rate Prediction","description":"","val":"Percentage"}},{{"name":"Goal Attainment","description":"","val":"Percentage"}},{{"name":"Platform Effectiveness","description":"","val":"Percentage"}},{{"name":"Positive Sentiment","description":"","val":"Percentage"}},{{"name":"Click-Through Rate (CTR)","description":"","val":"Percentage"}}]}}
+Do not include any text other than the JSON.
+
+"""
+
+        textContent = ChatCompletionContentPartTextParam(type="text", text=prompt)
+        
+        message = ChatCompletionUserMessageParam(role="user", content=[textContent])
+        outcomeRequest.messages.append(message)
+        messages = outcomeRequest.messages
+        responseFormat = ResponseFormat(type="json_object")
+        
+        
+        chat_completion = await client.chat.completions.create(model=self.model,
+                                  max_tokens=2500,
+                                  messages=messages,
+                                  response_format= responseFormat)
+        
+        assistantMessage = ChatCompletionAssistantMessageParam(role="assistant", content = chat_completion.choices[0].message.content)
+        
+        
+        jsonVal = json.loads(assistantMessage.content)
+        try:
+            outcomes = jsonVal["outcomes"]
+        except:
+            outcomes = jsonVal["Outcomes"]
+        return OutcomeResponse(outcomes=outcomes)

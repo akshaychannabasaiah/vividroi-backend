@@ -4,6 +4,8 @@ import warnings
 from app.chat.getGroqChat import GroqChat
 from app.model.CampaignAnalysisModel import CampaignAnalysis, CampaignAnalysisResponse
 from app.model.CampaignRequestModel import CampaignRequest
+from app.model.ChatMessageModel import ChatCompletionMessageParam
+from app.model.OutcomeResponseModel import OutcomeRequest, OutcomeResponse
 from app.model.PersonaModel import Persona, PersonaResponse
 from app.model.PersonaRequestModel import PersonaRequest
 from fastapi import Depends, APIRouter, Body, HTTPException 
@@ -49,6 +51,20 @@ async def campaign(campaignRequest: CampaignRequest = Body(None)):
     """
     try:
         response = await groqChat.getCampaignAnalysis(campaignRequest)
+        return response
+    except Exception as e:
+        warnings.warn(str(e))
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.post("/chat/outcome", tags=["Chat"], response_model=OutcomeResponse)
+async def campaign(messages: OutcomeRequest = Body(None)):
+    """
+    Returns personas to the given attributes
+    :param data:
+    :return:
+    """
+    try:
+        response = await groqChat.getOutcomes(messages)
         return response
     except Exception as e:
         warnings.warn(str(e))
