@@ -1,4 +1,6 @@
-# Python [Fastapi](https://fastapi.tiangolo.com/) Template Project with[poetry](https://python-poetry.org/) and [Docker](https://www.docker.com/101-tutorial)
+#Backend for vividroi.com hosted on Azure docker container
+
+
 
 ## used frameworks/technologies:
 - [Fastapi](https://fastapi.tiangolo.com/tutorial/)
